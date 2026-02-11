@@ -1,0 +1,71 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  AGENT
+  STUDENT
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+model User {
+  id              String     @id @default(uuid())
+  username        String     @unique
+  name            String
+  email           String     @unique
+  password        String
+  role            Role       @default(STUDENT)
+  status          UserStatus @default(ACTIVE)
+  isVerified      Boolean    @default(false)
+  
+  facultyId       String?
+  faculty         Faculty?   @relation(fields: [facultyId], references: [id])
+  
+  departmentId    String?
+  department      Department? @relation(fields: [departmentId], references: [id])
+  
+  level           Int?       // e.g. 100, 200
+  
+  referrerId      String?
+  referrer        User?      @relation("Referral", fields: [referrerId], references: [id])
+  referrals       User[]     @relation("Referral")
+  
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  @@index([email])
+}
+
+model Faculty {
+  id          String       @id @default(uuid())
+  name        String       @unique
+  departments Department[]
+  users       User[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model Department {
+  id        String   @id @default(uuid())
+  name      String
+  facultyId String
+  faculty   Faculty  @relation(fields: [facultyId], references: [id])
+  users     User[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([name, facultyId])
+}
