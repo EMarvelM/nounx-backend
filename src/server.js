@@ -49,12 +49,14 @@ app.get('/health', (req, res) => {
 // TEMP: Debug env vars (remove after confirming)
 app.get('/debug-env', (req, res) => {
     res.json({
+        node: process.version,
+        execPath: process.execPath,
+        envKeysSample: Object.keys(process.env).filter(k => k.includes('MONGO') || k.includes('JWT') || k.includes('DATABASE') || k.includes('ERP')),
         has_DATABASE_URL: !!process.env.DATABASE_URL,
         has_MONGODB_URI: !!process.env.MONGODB_URI,
         has_JWT_SECRET: !!process.env.JWT_SECRET,
         has_ERP_MIRROR_DB_URL: !!process.env.ERP_MIRROR_DB_URL,
         NODE_ENV: process.env.NODE_ENV,
-        execPath: process.execPath,
     });
 });
 
