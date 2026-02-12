@@ -45,6 +45,10 @@ app.use('/api/auth', authRoutes);
 const roomRoutes = require('./routes/rooms');
 app.use('/api/rooms', roomRoutes);
 
+// Identity Verification Routes
+const verifyRoutes = require('./routes/verify');
+app.use('/api/verify', verifyRoutes);
+
 // Socket Logic
 require('./socket/chat')(io);
 

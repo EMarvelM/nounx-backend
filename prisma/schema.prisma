@@ -30,6 +30,7 @@ model User {
   role            Role       @default(STUDENT)
   status          UserStatus @default(ACTIVE)
   isVerified      Boolean    @default(false)
+  matric          String?    @unique  // NOUN matric number (stored internally, never shown in chat)
   
   facultyId       String?
   faculty         Faculty?   @relation(fields: [facultyId], references: [id])
