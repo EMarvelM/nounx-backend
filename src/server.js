@@ -5,6 +5,7 @@ const { Server } = require('socket.io');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const { PrismaClient } = require('@prisma/client');
+const { swaggerUi, specs } = require('./utils/swagger');
 
 const app = express();
 const server = http.createServer(app);
@@ -32,6 +33,9 @@ mongoose.connect(process.env.MONGODB_URI)
 app.get('/health', (req, res) => {
     res.json({ status: 'ok', time: new Date() });
 });
+
+// Swagger Documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 // Auth Routes
 const authRoutes = require('./routes/auth');
