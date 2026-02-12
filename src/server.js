@@ -23,7 +23,16 @@ app.use(cors());
 app.use(express.json());
 
 // DB Connections
-// MySQL handled by Prisma automatically via DATABASE_URL
+// MySQL - Run schema sync at startup (Hostinger build env can't reach DB, only runtime can)
+const { execSync } = require('child_process');
+try {
+    console.log('Syncing database schema...');
+    execSync('npx prisma db push --accept-data-loss', { stdio: 'inherit' });
+    console.log('Database schema synced successfully');
+} catch (err) {
+    console.error('Database schema sync failed (tables may already exist):', err.message);
+}
+
 // MongoDB Connection
 mongoose.connect(process.env.MONGODB_URI)
     .then(() => console.log('Connected to MongoDB Atlas'))
