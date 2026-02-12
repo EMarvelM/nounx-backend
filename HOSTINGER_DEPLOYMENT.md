@@ -186,6 +186,26 @@ Deny from all
 </Files>
 ```
 
+### Database Connection Issues (P1000/P1001)
+If you get `P1001: Can't reach database server` or `P1000: Authentication failed` despite correct credentials:
+1. **Use `127.0.0.1` instead of `localhost`** in your `DATABASE_URL`. Prisma uses TCP, and `localhost` might resolve to IPv6 or a socket.
+   ```
+   DATABASE_URL="mysql://user:pass@127.0.0.1:3306/db_name"
+   ```
+2. **Verify Credentials**: Run `mysql -u user -p -e 'SELECT 1'` to test access via shell.
+3. **Manual Sync**: Run migration manually on the server:
+   ```bash
+   cd ~/domains/domain.com/public_html
+   ./node_modules/.bin/prisma db push
+   ```
+
+### Persistence Warning
+Manually created `.env` files in `public_html` **WILL be deleted** by Hostinger's Git deployment.
+You MUST either:
+- Commit `.env` to your private repo (easiest).
+- Create `.env` outside `public_html` (e.g. `~/domains/domain.com/.env`) and symlink it (script needed).
+- Use `ssh` to recreate it after every deploy.
+
 ### Restarting the App
 After editing `.env` or deploying code, force a restart:
 ```bash

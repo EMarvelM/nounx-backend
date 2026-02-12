@@ -1,6 +1,6 @@
 const Message = require('../models/Message');
 const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const prisma = require('../prisma');
 
 module.exports = (io) => {
     io.on('connection', (socket) => {

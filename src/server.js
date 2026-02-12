@@ -34,7 +34,7 @@ const io = new Server(server, {
     }
 });
 
-const prisma = new PrismaClient();
+const prisma = require('./prisma');
 
 // Middleware
 app.use(cors());
