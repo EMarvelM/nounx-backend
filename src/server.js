@@ -46,6 +46,17 @@ mongoose.connect(process.env.MONGODB_URI)
 app.get('/health', (req, res) => {
     res.json({ status: 'ok', time: new Date() });
 });
+// TEMP: Debug env vars (remove after confirming)
+app.get('/debug-env', (req, res) => {
+    res.json({
+        has_DATABASE_URL: !!process.env.DATABASE_URL,
+        has_MONGODB_URI: !!process.env.MONGODB_URI,
+        has_JWT_SECRET: !!process.env.JWT_SECRET,
+        has_ERP_MIRROR_DB_URL: !!process.env.ERP_MIRROR_DB_URL,
+        NODE_ENV: process.env.NODE_ENV,
+        execPath: process.execPath,
+    });
+});
 
 // Swagger Documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
