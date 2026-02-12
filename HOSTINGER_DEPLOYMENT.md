@@ -162,11 +162,36 @@ NODE_ENV=production
 
 ---
 
-## 🔧 Useful SSH Commands
+## 🔑 Environment Variables Solution
 
+Hostinger's "Deployment Settings" panel for environment variables **Does NOT inject variables at runtime**. It only works during build.
+
+**The ONLY working solution:**
+1. Create a `.env` file manually in `public_html/`.
+2. Secure it via `.htaccess`.
+3. Restart the app using `tmp/restart.txt`.
+
+### .htaccess Configuration (Crucial)
+You must include the Passenger configuration block or the app won't start:
+```apache
+PassengerAppRoot /home/u398189227/domains/lightpink-lark-246190.hostingersite.com/public_html
+PassengerAppType node
+PassengerNodejs /opt/alt/alt-nodejs22/root/bin/node
+PassengerStartupFile src/server.js
+PassengerBaseURI /
+
+<Files .env>
+Order allow,deny
+Deny from all
+</Files>
+```
+
+### Restarting the App
+After editing `.env` or deploying code, force a restart:
 ```bash
-# Connect
-ssh hostinger
+mkdir -p tmp
+touch tmp/restart.txt
+```
 
 # Navigate to app
 cd ~/domains/lightpink-lark-246190.hostingersite.com/public_html/
