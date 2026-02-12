@@ -40,20 +40,6 @@ const prisma = new PrismaClient();
 app.use(cors());
 app.use(express.json());
 
-// DB Connections — Sync schema at startup
-const { execSync } = require('child_process');
-
-try {
-    // Get the directory of the currently running Node.js binary
-    const nodeDir = path.dirname(process.execPath);
-    const env = { ...process.env, PATH: `${nodeDir}:${process.env.PATH || ''}` };
-    // Fix permissions on Prisma engine binaries
-    execSync('chmod +x ./node_modules/.bin/prisma ./node_modules/@prisma/engines/* 2>/dev/null || true');
-    const output = execSync('./node_modules/.bin/prisma db push --accept-data-loss 2>&1', { env }).toString();
-    console.log('Database schema synced:', output);
-} catch (err) {
-    console.error('Schema sync failed:', err.stdout ? err.stdout.toString() : err.message);
-}
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGODB_URI)
