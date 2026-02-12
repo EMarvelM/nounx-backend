@@ -42,7 +42,7 @@ app.use(express.json());
 
 // DB Connections — Sync schema at startup
 const { execSync } = require('child_process');
-const path = require('path');
+
 try {
     // Get the directory of the currently running Node.js binary
     const nodeDir = path.dirname(process.execPath);
