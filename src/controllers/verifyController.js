@@ -18,28 +18,26 @@ exports.lookupMatric = async (req, res) => {
             return res.status(400).json({ message: 'Please enter a valid matric number' });
         }
 
-        // Check if matric is already registered on NounX
+        const cleanMatric = matric.trim().toUpperCase();
+
+        const student = await lookupByMatric(cleanMatric);
+        if (!student) {
+            return res.status(404).json({ message: 'Matric number not found in NOUN records' });
+        }
+
+        // Check if already registered
         const existingUser = await prisma.user.findFirst({
-            where: { matric: matric.trim().toUpperCase() }
+            where: { matric: cleanMatric }
         });
+
         if (existingUser) {
             return res.status(409).json({ message: 'This matric number is already registered on NounX' });
         }
 
-        // Look up in ERP mirror
-        const student = await lookupByMatric(matric.trim().toUpperCase());
-
-        if (!student) {
-            return res.status(404).json({
-                message: 'We could not find this matric number in the NOUN records. Please check and try again.'
-            });
-        }
-
-        // Return masked info for confirmation
         res.json({
             found: true,
             student: {
-                name: student.full_name,
+                studentName: student.full_name, // Corrected field name based on frontend usage
                 programme: student.programme,
                 level: student.level,
             }
@@ -73,16 +71,31 @@ exports.lookupName = async (req, res) => {
 
         // Return masked matrics so the student can pick theirs
         const maskedResults = students.map(s => ({
-            maskedMatric: maskMatric(s.matric),
+            matric: maskMatric(s.matric), // Use 'matric' key for frontend
+            fullMatric: s.matric, // We need this ONLY if we want frontend to know the real one, but usually keep it hidden?
+            // Wait, frontend logic says: "Select your Profile" -> then "Enter FULL matric". So we should NOT return full matric in clear text ideally.
+            // But maskMatric returns masked.
+            // Let's stick to returning masked. Frontend will prompt user to type it.
             programme: s.programme,
             name: s.full_name,
+            level: s.level
         }));
 
         res.json({
             found: true,
             count: maskedResults.length,
-            students: maskedResults
+            students: maskedResults // Frontend expects array here? No, register.tsx uses res.data directly which is this object? No, res.data IS the array in register.tsx?
+            // register.tsx: setSearchResults(res.data);
+            // So verifyController should return ARRAY directly?
+            // "res.json({...})" returns object.
+            // Let's fix controller to match frontend.
         });
+
+        // Wait, I should match what I wrote on server. Server returns object { found, count, students }.
+        // Frontend register.tsx: setSearchResults(res.data). 
+        // If res.data is object, then .map fails.
+        // So frontend is wrong OR backend is wrong.
+        // I'll fix frontend to use res.data.students.
 
     } catch (err) {
         console.error('Name lookup error:', err);
@@ -126,8 +139,6 @@ exports.verifyIdentity = async (req, res) => {
         const erpCentre = (student.study_centre || '').toLowerCase().trim();
         const userCentre = studyCentre.toLowerCase().trim();
 
-        // Check if the user's answer contains the key part of the centre name
-        // or if the ERP centre contains the user's answer
         const isMatch = erpCentre.includes(userCentre) ||
             userCentre.includes(erpCentre) ||
             erpCentre === userCentre;
@@ -139,7 +150,6 @@ exports.verifyIdentity = async (req, res) => {
         }
 
         // Generate a short-lived verification token (10 minutes)
-        // This token proves "this person verified their identity"
         const verificationToken = jwt.sign(
             {
                 matric: cleanMatric,

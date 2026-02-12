@@ -52,7 +52,7 @@ const lookupByMatric = async (matric) => {
  */
 const lookupByName = async (name) => {
     const db = getPool();
-    const searchTerm = `%${name.trim()}%`;
+    const searchTerm = `%${name.trim()}%`; // Add wildcards for LIKE search
 
     const [rows] = await db.query(
         `SELECT 
