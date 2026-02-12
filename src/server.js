@@ -22,21 +22,19 @@ const prisma = new PrismaClient();
 app.use(cors());
 app.use(express.json());
 
-// MySQL - Run schema sync at startup (Hostinger build env can't reach DB, only runtime can)
+// DB Connections — Sync schema at startup
 const { execSync } = require('child_process');
-const fs = require('fs');
+const path = require('path');
 try {
-    console.log('Syncing database schema...');
-    // Fix permissions on Prisma engine binaries (Hostinger strips execute permissions)
+    // Get the directory of the currently running Node.js binary
+    const nodeDir = path.dirname(process.execPath);
+    const env = { ...process.env, PATH: `${nodeDir}:${process.env.PATH || ''}` };
+    // Fix permissions on Prisma engine binaries
     execSync('chmod +x ./node_modules/.bin/prisma ./node_modules/@prisma/engines/* 2>/dev/null || true');
-    const output = execSync('./node_modules/.bin/prisma db push --accept-data-loss 2>&1').toString();
-    fs.writeFileSync('prisma-sync.log', output);
-    console.log('Database schema synced successfully');
-    console.log(output);
+    const output = execSync('./node_modules/.bin/prisma db push --accept-data-loss 2>&1', { env }).toString();
+    console.log('Database schema synced:', output);
 } catch (err) {
-    const errorMsg = err.stdout ? err.stdout.toString() : err.message;
-    fs.writeFileSync('prisma-sync-error.log', errorMsg);
-    console.error('Database schema sync failed:', errorMsg);
+    console.error('Schema sync failed:', err.stdout ? err.stdout.toString() : err.message);
 }
 
 // MongoDB Connection
