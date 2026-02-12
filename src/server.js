@@ -1,3 +1,21 @@
+const fs = require('fs');
+const path = require('path');
+
+// Hostinger Persistency Hack:
+// Copy .env from parent directory (persistent) to current directory (wiped on deploy)
+try {
+    const persistentEnvPath = path.resolve(__dirname, '../../.env');
+    const targetEnvPath = path.resolve(__dirname, '../.env');
+    if (fs.existsSync(persistentEnvPath)) {
+        fs.copyFileSync(persistentEnvPath, targetEnvPath);
+        console.log('Server: Successfully restored persistent .env');
+    } else {
+        console.warn('Server: Persistent .env not found at', persistentEnvPath);
+    }
+} catch (error) {
+    console.error('Server: Failed to restore .env:', error);
+}
+
 require('dotenv').config();
 const express = require('express');
 const http = require('http');

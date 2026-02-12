@@ -1,7 +1,7 @@
 PassengerAppRoot /home/u398189227/domains/lightpink-lark-246190.hostingersite.com/public_html
 PassengerAppType node
 PassengerNodejs /opt/alt/alt-nodejs22/root/bin/node
-PassengerStartupFile src/loader.js
+PassengerStartupFile src/server.js
 PassengerBaseURI /
 
 <Files .env>
