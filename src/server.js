@@ -27,7 +27,7 @@ app.use(express.json());
 const { execSync } = require('child_process');
 try {
     console.log('Syncing database schema...');
-    execSync('npx prisma db push --accept-data-loss', { stdio: 'inherit' });
+    execSync('./node_modules/.bin/prisma db push --accept-data-loss', { stdio: 'inherit' });
     console.log('Database schema synced successfully');
 } catch (err) {
     console.error('Database schema sync failed (tables may already exist):', err.message);
