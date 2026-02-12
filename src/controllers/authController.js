@@ -37,7 +37,7 @@ exports.register = async (req, res) => {
                 name,
                 email,
                 password: hashedPassword,
-                role: role || 'STUDENT',
+                role: 'STUDENT', // Default all public registrations to STUDENT
                 facultyId,
                 departmentId,
                 level: level ? parseInt(level) : null,
