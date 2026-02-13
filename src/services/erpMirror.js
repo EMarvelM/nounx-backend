@@ -13,12 +13,7 @@ const getPool = () => {
         if (!url) {
             throw new Error('ERP_MIRROR_DB_URL environment variable is not set');
         }
-        pool = mysql.createPool({
-            uri: url,
-            waitForConnections: true,
-            connectionLimit: 5,
-            queueLimit: 0,
-        });
+        pool = mysql.createPool(url);
     }
     return pool;
 };
