@@ -76,9 +76,24 @@ const maskMatric = (matric) => {
     return `${prefix}${masked}${suffix}`;
 };
 
+/**
+ * Get all study centres for the dropdown list.
+ */
+const getAllStudyCentres = async () => {
+    const db = getPool();
+    const [rows] = await db.query(
+        `SELECT DISTINCT vcityname AS name 
+         FROM studycenter 
+         WHERE vcityname IS NOT NULL AND vcityname != ''
+         ORDER BY vcityname ASC`
+    );
+    return rows.map(r => r.name);
+};
+
 module.exports = {
     getPool,
     lookupByMatric,
     lookupByName,
     maskMatric,
+    getAllStudyCentres,
 };

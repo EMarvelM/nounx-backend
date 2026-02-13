@@ -28,7 +28,12 @@ const verifyController = require('../controllers/verifyController');
  *       409:
  *         description: Matric already registered on NounX
  */
+router.get('/centres', verifyController.getCentres);
 router.post('/lookup-matric', verifyController.lookupMatric);
+
+/**
+ * @swagger
+ * /api/verify/lookup-matric:
 
 /**
  * @swagger

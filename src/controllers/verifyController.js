@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { PrismaClient } = require('@prisma/client');
-const { lookupByMatric, lookupByName, maskMatric } = require('../services/erpMirror');
+const { lookupByMatric, lookupByName, maskMatric, getAllStudyCentres } = require('../services/erpMirror');
 
 const prisma = new PrismaClient();
 
@@ -290,3 +290,14 @@ exports.completeRegistration = async (req, res) => {
         res.status(500).json({ message: 'Something went wrong during registration. Please try again.' });
     }
 };
+
+exports.getCentres = async (req, res) => {
+    try {
+        const centres = await getAllStudyCentres();
+        res.json(centres);
+    } catch (err) {
+        console.error('Error fetching centres:', err);
+        res.status(500).json({ message: 'Error fetching study centres' });
+    }
+};
+
